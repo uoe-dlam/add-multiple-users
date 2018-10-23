@@ -317,18 +317,26 @@ class amuUserObject{
 		
 		global $wpdb;
 		$validateEmail = get_option('amu_validatemail');
-		
-		//verify user_login and email are unique and exist
-		if(username_exists($this->user_login)) {
-			$newid = __('Error: a user with this user_login already exists. This user was not registered.','amulang');
-		} else if($this->user_email == '') {
-			$newid = __('Error: an email address for the user','amulang').' '.$this->user_login.' '.__('was not provided. This user was not registered.','amulang');
-		} else if(email_exists($this->user_email)) {
-			$newid = __('Error: a user with the user_email address','amulang').' '.$this->user_email.' '.__('already exists. This user was not registered.','amulang');
-		} else if($validateEmail == 'yes' && !is_email($this->user_email)) {
-			$newid = __('Error: The user_email provided','amulang').' '.$this->user_email.' '.__('was not valid. This user was not registered.','amulang');
-		
-		//passes all checks, create new user
+
+        //verify user_login and email are unique and exist
+        // Altered by DLAM to add users to blog if they already exist on network, instead of giving error message.
+        $existing_user_id = username_exists( $this->user_login );
+        if ( ! empty( $existing_user_id ) ) {
+            if ( is_multisite() ) {
+                add_existing_user_to_blog( array( 'user_id' => $existing_user_id, 'role' => $this->role ) );
+            } else {
+                $wp_user_object = get_userdata( $existing_user_id );
+                $wp_user_object->set_role( $this->role );
+            }
+            $newid = $existing_user_id;
+        } else if($this->user_email == '') {
+            $newid = __('Error: an email address for the user','amulang').' '.$this->user_login.' '.__('was not provided. This user was not registered.','amulang');
+        } else if(email_exists($this->user_email)) {
+            $newid = __('Error: a user with the user_email address','amulang').' '.$this->user_email.' '.__('already exists. This user was not registered.','amulang');
+        } else if($validateEmail == 'yes' && !is_email($this->user_email)) {
+            $newid = __('Error: The user_email provided','amulang').' '.$this->user_email.' '.__('was not valid. This user was not registered.','amulang');
+
+            //passes all checks, create new user
 		} else {
 			$addnewuser = wp_create_user($this->user_login, $this->user_pass, $this->user_email);
 			$wp_user_object = new WP_User($this->user_login);
