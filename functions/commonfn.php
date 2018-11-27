@@ -5,6 +5,8 @@
  * Common Functions and Classes
  */
 
+require_once 'ldap-config.php';
+
 //protect from direct call
 if ( !function_exists( 'add_action' ) ) {
 	echo "Access denied!";
@@ -253,6 +255,7 @@ class amuUserObject{
 		
 		//get amu options
 		global $wpdb;
+		global $amu_ldap_config;
 		$setAllRoles = get_option('amu_setallroles');
 		$validateStrict = get_option( 'amu_validatestrict');
 		$forceEmail = get_option('amu_forcefill');
@@ -334,8 +337,9 @@ class amuUserObject{
         } else if(email_exists($this->user_email)) {
             $newid = __('Error: a user with the user_email address','amulang').' '.$this->user_email.' '.__('already exists. This user was not registered.','amulang');
         } else if($validateEmail == 'yes' && !is_email($this->user_email)) {
-            $newid = __('Error: The user_email provided','amulang').' '.$this->user_email.' '.__('was not valid. This user was not registered.','amulang');
-
+            $newid = __('Error: The user_email provided', 'amulang') . ' ' . $this->user_email . ' ' . __('was not valid. This user was not registered.', 'amulang');
+        } else if(! $this->is_valid_uun($this->user_login)) {
+            $newid = __('Error: username ','amulang').' '.$this->user_login.' '.__('is not a valid Univeristy of Edinburgh uun','amulang');
             //passes all checks, create new user
 		} else {
 			$addnewuser = wp_create_user($this->user_login, $this->user_pass, $this->user_email);
@@ -357,6 +361,33 @@ class amuUserObject{
 		//return message
 		return $newid;
 	}
+
+    /**
+     * Contacts central auth to determine if uun exists
+     *
+     * @param string $uun
+     *
+     * @return boolean
+     */
+    function is_valid_uun( $uun ) {
+        global $amu_ldap_config;
+        $ldapconn  = ldap_connect(  $amu_ldap_config['ldaphost'],  $amu_ldap_config['ldapport'] ) or wp_die( "Could not connect to {$amu_ldap_config['ldaphost']}", 200 );
+        $filter    = '(&(uid=' . $uun . '))';
+        $justthese = array( '*' );
+        $sr        = ldap_search( $ldapconn,  $amu_ldap_config['dn'], $filter, $justthese );
+
+        // display entries from ldap.
+        $info = ldap_get_entries( $ldapconn, $sr );
+
+        foreach ( $info as $elt ) {
+            if ( $elt['edunitype'][0] > 0 ) {
+                // if we have got to this point we have a valid user.
+                return true;
+            }
+        }
+
+        return false;
+    }
 	
 	//UPDATE STANDARD DATA FUNCTION
 	
