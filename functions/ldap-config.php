@@ -13,3 +13,4 @@ if ( ENVIRONMENT === 'production' ) {
 		'dn'       => 'ou=people,ou=central,dc=authorise-test,dc=ed,dc=ac,dc=uk',
 	);
 }
+xxx
