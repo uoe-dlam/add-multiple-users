@@ -2,6 +2,6 @@
 
 $amu_ldap_config = array(
     'ldaphost' => '',
-    'ldapport' => ,
+    'ldapport' => 0,
     'dn'       => '',
 );
