@@ -325,6 +325,7 @@ class amuUserObject{
 		
 		global $wpdb;
 		$validateEmail = get_option('amu_validatemail');
+		$do_ldap_username_validation = get_site_option('amu_ldap_username_validation', 0);
 
         //verify user_login and email are unique and exist
         // Altered by DLAM to add users to blog if they already exist on network, instead of giving error message.
@@ -343,7 +344,7 @@ class amuUserObject{
             $newid = __('Error: a user with the user_email address','amulang').' '.$this->user_email.' '.__('already exists. This user was not registered.','amulang');
         } else if($validateEmail == 'yes' && !is_email($this->user_email)) {
             $newid = __('Error: The user_email provided', 'amulang') . ' ' . $this->user_email . ' ' . __('was not valid. This user was not registered.', 'amulang');
-        } else if(! $this->is_valid_UUN($this->user_login)) {
+        } else if($do_ldap_username_validation && ! $this->is_valid_UUN($this->user_login)) {
             $newid = __('Error: username ','amulang').' '.$this->user_login.' '.__('is not a valid Univeristy of Edinburgh uun','amulang');
             //passes all checks, create new user
 		} else {
