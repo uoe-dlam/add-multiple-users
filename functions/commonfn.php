@@ -342,8 +342,8 @@ class amuUserObject{
             $newid = __('Error: a user with the user_email address','amulang').' '.$this->user_email.' '.__('already exists. This user was not registered.','amulang');
         } else if($validateEmail == 'yes' && !is_email($this->user_email)) {
             $newid = __('Error: The user_email provided', 'amulang') . ' ' . $this->user_email . ' ' . __('was not valid. This user was not registered.', 'amulang');
-        } else if($do_ldap_username_validation && ! $this->is_valid_UUN($this->user_login)) {
-            $newid = __('Error: username ','amulang').' '.$this->user_login.' '.__('is not a valid Univeristy of Edinburgh uun','amulang');
+        } else if($do_ldap_username_validation && ! $this->is_valid_uun($this->user_login)) {
+            $newid = __('Error: username ','amulang').' '.$this->user_login.' '.__('is not a valid Univeristy of Edinburgh UUN','amulang');
             //passes all checks, create new user
 		} else {
 			$addnewuser = wp_create_user($this->user_login, $this->user_pass, $this->user_email);
@@ -373,7 +373,7 @@ class amuUserObject{
      *
      * @return boolean
      */
-    function is_valid_UUN($uun ) {
+    function is_valid_uun($uun ) {
         $ldap_conn  = ldap_connect(  get_site_option( 'ldap_host' ),  get_site_option( 'ldap_port' ) ) or wp_die( "Could not connect to " . get_site_option( 'ldap_host' ), 200 );
         $filter    = '(&(uid=' . $uun . '))';
         $attributes = array( '*' );
