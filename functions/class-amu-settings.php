@@ -26,7 +26,6 @@ class AMU_Settings {
 	 * @return void
 	 */
 	public function initialize_options() {
-
 		if ( ! get_site_option( 'amu_ldap_username_validation' ) ) {
 			add_site_option( 'amu_ldap_username_validation', '' );
 		}
@@ -42,13 +41,12 @@ class AMU_Settings {
 		if ( ! get_site_option( 'ldap_dn' ) ) {
 			add_site_option( 'ldap_dn', '' );
 		}
-
 	}
 
 	/**
 	 * Creates AMU Config settings page and menu item.
 	 *
-	 * @return AMU_Settings_Config
+	 * @return AMU_Settings
 	 */
 	public function create_setup_page() {
 		add_submenu_page(
@@ -149,7 +147,6 @@ class AMU_Settings {
 	 */
 	public function update() {
 		if ( isset( $_POST['submit'] ) ) {
-
 			// verify authentication (nonce)
 			if ( ! isset( $_POST['amu_settings_nonce'] ) ) {
 				return;
@@ -178,7 +175,7 @@ class AMU_Settings {
 	 * @return array
 	 */
 	private function do_validation() {
-		$errors = [];
+	    $errors = [];
 
         // phpcs:disable
         if ( '' === $_POST['ldap_host'] ) {
@@ -187,7 +184,7 @@ class AMU_Settings {
 
         if ( '' === $_POST['ldap_port'] ) {
             $errors[] = 'LDAP Port is required';
-        } elseif( ! is_integer( (int) $_POST['ldap_port'] ) ) {
+        } elseif( ! is_int( (int) $_POST['ldap_port'] ) ) {
             $errors[] = 'LDAP Port must be a valid integer';
         }
         // phpcs:enable
@@ -201,7 +198,6 @@ class AMU_Settings {
 	 * @return void
 	 */
 	public function update_settings() {
-
 		if ( isset( $_POST['amu_ldap_username_validation'] ) ) {
 			update_site_option( 'amu_ldap_username_validation', '1' );
 		} else {

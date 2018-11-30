@@ -251,7 +251,7 @@ function amuRegisterFromForm() {
 
 class amuUserObject{
 
-    protected $config;
+    private $config;
 
 	function __construct($userInfoArray) {
 		

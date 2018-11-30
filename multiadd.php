@@ -179,7 +179,7 @@ include('functions/helpfiles.php');
 include('functions/settings.php');
 include('functions/csvimport.php');
 include('functions/ajaxfunctions.php');
-include('functions/networksettings.php');
+include('functions/class-amu-settings.php');
 
 // <=========== LOCALIZATION ====================================================>
 
