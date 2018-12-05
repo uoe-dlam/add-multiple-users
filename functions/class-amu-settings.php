@@ -175,7 +175,7 @@ class AMU_Settings {
 	 * @return array
 	 */
 	private function do_validation() {
-	    $errors = [];
+		$errors = [];
 
         // phpcs:disable
         if ( '' === $_POST['ldap_host'] ) {
