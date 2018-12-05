@@ -5,8 +5,6 @@
  * Common Functions and Classes
  */
 
-require_once 'ldap-config.php';
-
 //protect from direct call
 if ( !function_exists( 'add_action' ) ) {
 	echo "Access denied!";
