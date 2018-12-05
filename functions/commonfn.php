@@ -251,8 +251,6 @@ function amuRegisterFromForm() {
 
 class amuUserObject{
 
-    private $config;
-
 	function __construct($userInfoArray) {
 		
 		//get amu options
