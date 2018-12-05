@@ -218,5 +218,4 @@ class AMU_Settings {
 
 		$this->updated = true;
 	}
-
 }
