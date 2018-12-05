@@ -5,6 +5,8 @@
  * Common Functions and Classes
  */
 
+require_once 'ldap-config.php';
+
 //protect from direct call
 if ( !function_exists( 'add_action' ) ) {
 	echo "Access denied!";
@@ -248,11 +250,13 @@ function amuRegisterFromForm() {
 */
 
 class amuUserObject{
-		
+
 	function __construct($userInfoArray) {
 		
 		//get amu options
 		global $wpdb;
+		global $amu_ldap_config;
+
 		$setAllRoles = get_option('amu_setallroles');
 		$validateStrict = get_option( 'amu_validatestrict');
 		$forceEmail = get_option('amu_forcefill');
@@ -317,6 +321,7 @@ class amuUserObject{
 		
 		global $wpdb;
 		$validateEmail = get_option('amu_validatemail');
+		$do_ldap_username_validation = get_site_option('amu_ldap_username_validation', 0);
 
         //verify user_login and email are unique and exist
         // Altered by DLAM to add users to blog if they already exist on network, instead of giving error message.
@@ -334,8 +339,9 @@ class amuUserObject{
         } else if(email_exists($this->user_email)) {
             $newid = __('Error: a user with the user_email address','amulang').' '.$this->user_email.' '.__('already exists. This user was not registered.','amulang');
         } else if($validateEmail == 'yes' && !is_email($this->user_email)) {
-            $newid = __('Error: The user_email provided','amulang').' '.$this->user_email.' '.__('was not valid. This user was not registered.','amulang');
-
+            $newid = __('Error: The user_email provided', 'amulang') . ' ' . $this->user_email . ' ' . __('was not valid. This user was not registered.', 'amulang');
+        } else if($do_ldap_username_validation && ! $this->is_valid_uun($this->user_login)) {
+            $newid = __('Error: username ','amulang').' '.$this->user_login.' '.__('is not a valid Univeristy of Edinburgh UUN','amulang');
             //passes all checks, create new user
 		} else {
 			$addnewuser = wp_create_user($this->user_login, $this->user_pass, $this->user_email);
@@ -357,6 +363,32 @@ class amuUserObject{
 		//return message
 		return $newid;
 	}
+
+    /**
+     * Contacts central auth to determine if uun exists
+     *
+     * @param string $uun
+     *
+     * @return boolean
+     */
+    function is_valid_uun($uun ) {
+        $ldap_conn  = ldap_connect(  get_site_option( 'ldap_host' ),  get_site_option( 'ldap_port' ) ) or wp_die( "Could not connect to " . get_site_option( 'ldap_host' ), 200 );
+        $filter    = '(&(uid=' . $uun . '))';
+        $attributes = array( '*' );
+        $sr        = ldap_search( $ldap_conn,  get_site_option( 'ldap_dn' ), $filter, $attributes );
+
+        // display entries from ldap.
+        $entries = ldap_get_entries( $ldap_conn, $sr );
+
+        foreach ( $entries as $entry ) {
+            if ( $entry['edunitype'][0] > 0 ) {
+                // if we have got to this point we have a valid user.
+                return true;
+            }
+        }
+
+        return false;
+    }
 	
 	//UPDATE STANDARD DATA FUNCTION
 	

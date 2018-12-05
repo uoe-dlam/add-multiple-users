@@ -179,8 +179,13 @@ include('functions/helpfiles.php');
 include('functions/settings.php');
 include('functions/csvimport.php');
 include('functions/ajaxfunctions.php');
+include('functions/class-amu-settings.php');
 
 // <=========== LOCALIZATION ====================================================>
 
 load_plugin_textdomain('amulang', false, dirname(plugin_basename(__FILE__)) . '/lang');
+
+// <=========== LOAD SETTINGS PAGE ====================================================>
+new AMU_Settings();
+
 ?>
